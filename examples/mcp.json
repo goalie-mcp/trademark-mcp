@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "goalieip": {
+      "type": "http",
+      "url": "https://www.goalieip.com/api/mcp",
+      "headers": {
+        "Authorization": "Bearer gip_live_your_key_here"
+      }
+    }
+  }
+}

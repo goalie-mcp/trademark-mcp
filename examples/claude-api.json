@@ -1,0 +1,10 @@
+{
+  "mcp_servers": [
+    {
+      "type": "url",
+      "url": "https://www.goalieip.com/api/mcp",
+      "name": "goalieip",
+      "authorization_token": "gip_live_your_key_here"
+    }
+  ]
+}

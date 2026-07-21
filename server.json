@@ -1,0 +1,16 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-07-09/server.schema.json",
+  "name": "io.github.goalie-mcp/trademark",
+  "description": "Search and filter 14M+ USPTO trademark records from an AI agent — by mark, owner, goods/services, class, status, and date. Not just serial-number lookups.",
+  "version": "1.0.0",
+  "repository": {
+    "url": "https://github.com/goalie-mcp/trademark-mcp",
+    "source": "github"
+  },
+  "remotes": [
+    {
+      "type": "streamable-http",
+      "url": "https://www.goalieip.com/api/mcp"
+    }
+  ]
+}

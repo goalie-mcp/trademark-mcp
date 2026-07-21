@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "goalieip": {
+      "command": "cmd",
+      "args": [
+        "/c", "npx", "-y", "mcp-remote@latest",
+        "https://www.goalieip.com/api/mcp",
+        "--header", "Authorization:Bearer ${GOALIE_KEY}"
+      ],
+      "env": { "GOALIE_KEY": "gip_live_your_key_here" }
+    }
+  }
+}

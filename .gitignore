@@ -1,0 +1,13 @@
+# Secrets — never commit a real API key
+.env
+.env.*
+*.key
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Node (only if examples grow to include scripts)
+node_modules/
