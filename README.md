@@ -69,6 +69,22 @@ parameter to change, so the agent can correct itself and retry.
 
 ---
 
+## In the MCP Registry
+
+This server is published to the official
+[MCP Registry](https://registry.modelcontextprotocol.io) as **`com.goalieip/trademark`**, under a
+namespace verified against the `goalieip.com` domain — so the listing is first-party, not a
+third-party mirror.
+
+```bash
+curl "https://registry.modelcontextprotocol.io/v0/servers?search=com.goalieip/trademark"
+```
+
+Clients that read the registry can add the server by name, and will prompt for the `Authorization`
+header themselves. Clients that don't, use the manual configs below.
+
+---
+
 ## Connect from any client
 
 Config files for each client are in [`examples/`](examples/). Replace `gip_live_your_key_here` with a
@@ -138,6 +154,7 @@ colon so argument parsing doesn't split it.
 
 | | |
 |---|---|
+| **Registry name** | `com.goalieip/trademark` ([MCP Registry](https://registry.modelcontextprotocol.io)) |
 | **Endpoint** | `https://www.goalieip.com/api/mcp` |
 | **Transport** | Streamable HTTP (remote — nothing to install or self-host) |
 | **Protocol revisions** | `2026-07-28` native; `2025-11-25` also answered on the same URL |
@@ -181,6 +198,7 @@ quota faster than a scripted one-request-per-lookup integration. Budget for that
 ## Links
 
 - **Overview:** https://www.goalieip.com/mcp
+- **MCP Registry listing:** https://registry.modelcontextprotocol.io/v0/servers?search=com.goalieip/trademark
 - **Full docs:** https://www.goalieip.com/docs#mcp
 - **Get an API key:** https://www.goalieip.com/portal/api-keys
 - **Plans & pricing:** https://www.goalieip.com/subscribe#api
