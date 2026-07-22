@@ -1,7 +1,12 @@
-# Example client configs
+# Examples
 
 Drop-in configuration for connecting each client to the hosted Goalie IP trademark MCP server at
 `https://www.goalieip.com/api/mcp`.
+
+Looking for what you can *ask* once connected? See [`prompts.md`](prompts.md) for two real sessions
+with full results.
+
+## Client configs
 
 In every file, replace `gip_live_your_key_here` with a real key from your
 [portal](https://www.goalieip.com/portal/api-keys). **Do not commit a real key** — treat it like a

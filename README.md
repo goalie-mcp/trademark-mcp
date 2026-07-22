@@ -28,6 +28,9 @@ have the numbers for.
 | Surface similar marks for clearance-style questions | ❌ | ✅ |
 | Search across all 14M+ US federal records at once | ❌ | ✅ |
 
+See [`examples/prompts.md`](examples/prompts.md) for two real sessions — including a ten-name
+clearance screen that a lookup-only tool cannot begin, because no serial numbers are known going in.
+
 ---
 
 ## Quickstart (Claude Code)
@@ -197,6 +200,7 @@ quota faster than a scripted one-request-per-lookup integration. Budget for that
 
 ## Links
 
+- **Example prompts & real results:** [`examples/prompts.md`](examples/prompts.md)
 - **Overview:** https://www.goalieip.com/mcp
 - **MCP Registry listing:** https://registry.modelcontextprotocol.io/v0/servers?search=com.goalieip/trademark
 - **Full docs:** https://www.goalieip.com/docs#mcp
