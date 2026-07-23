@@ -3,6 +3,9 @@
 .env.*
 *.key
 
+# Internal working notes — not for the public repo
+distribution-notes.txt
+
 # OS / editor
 .DS_Store
 Thumbs.db
