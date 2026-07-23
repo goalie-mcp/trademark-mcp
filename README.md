@@ -1,5 +1,7 @@
 # Trademark MCP Server (USPTO)
 
+[![MCP Badge](https://lobehub.com/badge/mcp-full/goalieip-trademark-mcp?theme=light)](https://lobehub.com/mcp/goalieip-trademark-mcp)
+
 A remote **[Model Context Protocol](https://modelcontextprotocol.io)** server that lets an AI agent
 **search and filter 14M+ USPTO trademark records** — by mark text, owner, goods/services, class,
 status, and date — then pull any full record by serial number.
