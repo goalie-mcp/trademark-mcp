@@ -45,6 +45,9 @@ claude mcp add --transport http goalieip \
   --header "Authorization: Bearer gip_live_your_key_here"
 ```
 
+Prefer not to paste a key? Omit the `--header` and Claude Code opens a browser to sign in with your
+Goalie IP account over OAuth.
+
 Then just ask — the agent picks the tool and filters on its own:
 
 ```
@@ -85,15 +88,23 @@ third-party mirror.
 curl "https://registry.modelcontextprotocol.io/v0/servers?search=com.goalieip/trademark"
 ```
 
-Clients that read the registry can add the server by name, and will prompt for the `Authorization`
-header themselves. Clients that don't, use the manual configs below.
+Clients that read the registry can add the server by name and will prompt for authorization
+themselves — an OAuth sign-in, or an API key. Clients that don't, use the manual configs below.
 
 ---
 
 ## Connect from any client
 
-Config files for each client are in [`examples/`](examples/). Replace `gip_live_your_key_here` with a
-key from your [portal](https://www.goalieip.com/portal/api-keys).
+Two ways to authenticate, both on the same endpoint:
+
+- **OAuth** — easiest for apps with a *Connect* / *Add connector* screen (Claude Desktop, claude.ai).
+  Paste the endpoint URL and sign in with your Goalie IP account when prompted; the client registers
+  itself automatically (Dynamic Client Registration + PKCE) and needs no key.
+- **API key** — for CLI and programmatic clients. Send your key as an `Authorization: Bearer` header.
+  Create one in your [portal](https://www.goalieip.com/portal/api-keys).
+
+Drop-in config files for the API-key path are in [`examples/`](examples/); replace
+`gip_live_your_key_here` with a real key.
 
 ### Claude API (MCP connector)
 
@@ -126,32 +137,22 @@ key from your [portal](https://www.goalieip.com/portal/api-keys).
 }
 ```
 
-### Claude Desktop
+### Claude Desktop & claude.ai
 
-Claude Desktop's *Add connector* screen only accepts OAuth, so connect through the small
-[`mcp-remote`](https://github.com/geelen/mcp-remote) bridge, which attaches your key for you. Full
-step-by-step (including the "fully quit before editing" gotcha) is at
-[goalieip.com/docs#mcp](https://www.goalieip.com/docs#mcp).
+Use OAuth — no bridge, no key file. Open **Settings → Connectors → Add custom connector** and paste
+the endpoint URL:
 
-```json
-{
-  "mcpServers": {
-    "goalieip": {
-      "command": "cmd",
-      "args": [
-        "/c", "npx", "-y", "mcp-remote@latest",
-        "https://www.goalieip.com/api/mcp",
-        "--header", "Authorization:Bearer ${GOALIE_KEY}"
-      ],
-      "env": { "GOALIE_KEY": "gip_live_your_key_here" }
-    }
-  }
-}
+```
+https://www.goalieip.com/api/mcp
 ```
 
-On macOS, drop the `"cmd", "/c",` entries so the args start at `"npx"`. The bridge needs
-[Node.js](https://nodejs.org). The header is written `Authorization:Bearer` with no space after the
-colon so argument parsing doesn't split it.
+Claude registers itself automatically (PKCE), sends you to sign in with your Goalie IP account, and
+stores the token. Approve the `trademark.read` scope and you're connected.
+
+*No-OAuth fallback (older clients):* attach an API key through the
+[`mcp-remote`](https://github.com/geelen/mcp-remote) bridge — config in
+[`examples/claude-desktop-config.json`](examples/claude-desktop-config.json), full steps (including
+the "fully quit before editing" gotcha) at [goalieip.com/docs#mcp](https://www.goalieip.com/docs#mcp).
 
 ---
 
@@ -163,7 +164,7 @@ colon so argument parsing doesn't split it.
 | **Endpoint** | `https://www.goalieip.com/api/mcp` |
 | **Transport** | Streamable HTTP (remote — nothing to install or self-host) |
 | **Protocol revisions** | `2026-07-28` native; `2025-11-25` also answered on the same URL |
-| **Authentication** | Bearer API key, identical to the REST API |
+| **Authentication** | OAuth 2.1 (PKCE + Dynamic Client Registration, scope `trademark.read`), or a Bearer API key identical to the REST API — same endpoint |
 | **Coverage** | US federal (USPTO) applications and registrations, refreshed daily |
 
 Always configure the `www` host. `goalieip.com` 301-redirects to `www`, and many clients drop the
