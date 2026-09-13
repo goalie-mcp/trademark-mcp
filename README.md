@@ -61,12 +61,13 @@ Then just ask — the agent picks the tool and filters on its own:
 
 ---
 
-## The two tools
+## The three tools
 
 | Tool | What it does |
 |---|---|
 | `search_trademarks` | Search 14M+ US federal records by mark text (exact, contains, or fuzzy), owner, goods/services, serial or registration number, international class, status code, and filing or registration date ranges. Returns compact summaries with a total match count. |
 | `get_trademark` | Retrieve the complete record for one serial number — full goods/services text, owner details, status history, classifications, and prior registrations. |
+| `get_account` | Report the connected account, plan tier, authentication method, and calls used, included, and remaining this billing period. Takes no arguments, reports only on the authenticated caller, and does not count against your quota. |
 
 `search_trademarks` returns compact summaries (page size defaults to 10, capped at 15) sized to sit
 in a model's context window; call `get_trademark` for the full record. Every search must include at
@@ -209,6 +210,18 @@ quota faster than a scripted one-request-per-lookup integration. Budget for that
 - **Full docs:** https://www.goalieip.com/docs#mcp
 - **Get an API key:** https://www.goalieip.com/portal/api-keys
 - **Plans & pricing:** https://www.goalieip.com/subscribe#api
+- **Support:** reid@goalieip.com
+
+## Privacy Policy
+
+https://www.goalieip.com/legal/privacy
+
+The server records one usage log row per billable call — the credential identifier, the tool called,
+the status code, and the timestamp — for quota enforcement, billing, and abuse detection. **The
+contents of your queries are not stored**, and nothing about your conversation, prompts, or files
+reaches the server. OAuth tokens are stored only as hashes, and any authorized client can be revoked
+from your account portal at any time. The policy above covers collection, use, third-party sharing,
+retention, and how to contact us.
 
 ## License
 
