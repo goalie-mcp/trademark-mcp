@@ -2,13 +2,25 @@
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
   "name": "com.goalieip/trademark",
   "title": "Goalie IP Trademark Search (USPTO)",
-  "description": "Search 14M+ USPTO trademark records by mark, owner, goods/services, class, status, and date.",
-  "version": "1.0.0",
+  "description": "Search 14M+ US trademarks by mark, owner, goods/services, class, status, and phonetic variants.",
+  "version": "1.0.1",
   "websiteUrl": "https://www.goalieip.com/mcp",
   "repository": {
     "url": "https://github.com/goalie-mcp/trademark-mcp",
     "source": "github"
   },
+  "icons": [
+    {
+      "src": "https://www.goalieip.com/apple-icon",
+      "mimeType": "image/png",
+      "sizes": ["180x180"]
+    },
+    {
+      "src": "https://www.goalieip.com/icon.svg",
+      "mimeType": "image/svg+xml",
+      "sizes": ["any"]
+    }
+  ],
   "remotes": [
     {
       "type": "streamable-http",
@@ -16,8 +28,8 @@
       "headers": [
         {
           "name": "Authorization",
-          "description": "Bearer token using a Goalie IP API key from https://www.goalieip.com/portal/api-keys (format: 'Bearer gip_live_...')",
-          "isRequired": true,
+          "description": "Optional. Leave blank to sign in with OAuth 2.1 (clients discover it automatically). Or send a Goalie IP API key from https://www.goalieip.com/portal/api-keys as 'Bearer gip_live_...'.",
+          "isRequired": false,
           "isSecret": true
         }
       ]

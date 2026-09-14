@@ -17,7 +17,7 @@ are in `[square brackets]`. No results were changed.
 
 ---
 
-## Sample 1 — Naming shortlist screened against the live register
+## Sample 1 — Naming shortlist screened against the register
 
 **Model:** Opus 4.8 · **Tool calls:** ~10 · **Why it matters:** ten candidate marks, zero known serial
 numbers. A TSDR-style lookup tool cannot start this task at all.
@@ -53,7 +53,7 @@ the 2 or 3 closest live trademarks for each proposed mark.
 >
 > […]
 >
-> Here are 10 dog-themed candidates, each searched against the live USPTO register in the two classes
+> Here are 10 dog-themed candidates, each searched against the [daily-refreshed Goalie IP copy of the] USPTO register in the two classes
 > a software business usually files in — Class 009 (downloadable software) and Class 042 (SaaS). The
 > "closest live marks" column shows live registrations/applications in those classes only.
 

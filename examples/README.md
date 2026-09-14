@@ -8,10 +8,10 @@ with full results.
 
 ## Two ways to authenticate
 
-- **OAuth** — for clients with a *Connect* / *Add connector* screen (Claude Desktop, claude.ai): just
-  paste the endpoint URL and sign in with your Goalie IP account. No config file, no key. This is the
-  simplest path where it's available, so those clients don't need a file below.
-- **API key** — for CLI and programmatic clients: the config files here send your key as an
+- **OAuth** — for clients that support it (Claude Desktop, claude.ai, Claude Code): just add the
+  endpoint URL and sign in with your Goalie IP account. No config file, no key. This is the simplest
+  path where it's available, so those clients don't need a file below.
+- **API key** — for scripts, CI, and clients without OAuth: the config files here send your key as an
   `Authorization: Bearer` header.
 
 ## Client configs (API-key path)

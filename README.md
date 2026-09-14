@@ -3,13 +3,22 @@
 [![MCP Badge](https://lobehub.com/badge/mcp-full/goalieip-trademark-mcp?theme=light)](https://lobehub.com/mcp/goalieip-trademark-mcp)
 
 A remote **[Model Context Protocol](https://modelcontextprotocol.io)** server that lets an AI agent
-**search and filter 14M+ USPTO trademark records** — by mark text, owner, goods/services, class,
-status, and date — then pull any full record by serial number.
+**search and filter 14M+ US federal trademark records** — by mark text, owner, goods/services, class,
+status, date, and every other searchable field on the record — then pull any full record by serial
+number.
 
-Point Claude Code, the Claude API, Cursor, or any MCP client at one URL and your agent can query the
-US federal trademark register with **no integration code to write**.
+Point Claude, Cursor, or any MCP client at one URL. No integration code, nothing to install, and
+**free to start: 200 calls/month, no credit card.**
 
-> **Get a key and full docs:** **[goalieip.com/mcp](https://www.goalieip.com/mcp)** ·
+- **Search, not lookup.** Find the marks you *don't* already have serial numbers for.
+- **Catches the variants.** Fuzzy matching, plus the USPTO's own pseudo-mark field (`GR8` → `GREAT`),
+  translations, and transliterations — the places near-conflicts hide.
+- **Runs without babysitting.** Every tool is declared read-only, so clients that honor tool
+  annotations can run a dozen searches without a confirmation prompt on each one.
+- **Sign in, no key required.** One-click OAuth on claude.ai and Claude Desktop; a Bearer key when you
+  want one for scripts and CLI.
+
+> **Start free and read the docs:** **[goalieip.com/mcp](https://www.goalieip.com/mcp)** ·
 > setup for every client at **[goalieip.com/docs#mcp](https://www.goalieip.com/docs#mcp)**
 
 ---
@@ -27,6 +36,8 @@ have the numbers for.
 | Search by mark text — exact, contains, or fuzzy | ❌ | ✅ |
 | Filter by owner, goods/services, and class | ❌ | ✅ |
 | Filter by status and filing / registration date | ❌ | ✅ |
+| Match phonetic and stylized variants via the USPTO pseudo-mark | ❌ | ✅ |
+| Search translations, disclaimers, mark descriptions, and attorney of record | ❌ | ✅ |
 | Surface similar marks for clearance-style questions | ❌ | ✅ |
 | Search across all 14M+ US federal records at once | ❌ | ✅ |
 
@@ -37,16 +48,24 @@ clearance screen that a lookup-only tool cannot begin, because no serial numbers
 
 ## Quickstart (Claude Code)
 
-Create an API key in your [Goalie IP portal](https://www.goalieip.com/portal/api-keys), then:
+No key needed — one command, then sign in:
+
+```bash
+claude mcp add --transport http goalieip https://www.goalieip.com/api/mcp
+```
+
+Claude Code opens a browser to sign in with your Goalie IP account over OAuth. No account yet?
+[Sign up free](https://www.goalieip.com/signup) — 200 calls/month, no credit card; just confirm your
+email to activate.
+
+Prefer a key, for scripts or CI? Create one in your
+[Goalie IP portal](https://www.goalieip.com/portal/api-keys) and pass it as a header:
 
 ```bash
 claude mcp add --transport http goalieip \
   https://www.goalieip.com/api/mcp \
   --header "Authorization: Bearer gip_live_your_key_here"
 ```
-
-Prefer not to paste a key? Omit the `--header` and Claude Code opens a browser to sign in with your
-Goalie IP account over OAuth.
 
 Then just ask — the agent picks the tool and filters on its own:
 
@@ -65,7 +84,7 @@ Then just ask — the agent picks the tool and filters on its own:
 
 | Tool | What it does |
 |---|---|
-| `search_trademarks` | Search 14M+ US federal records by mark text (exact, contains, or fuzzy), owner, goods/services, serial or registration number, international class, status code, and filing or registration date ranges. Returns compact summaries with a total match count. |
+| `search_trademarks` | Search 14M+ US federal records by mark text (exact, contains, or fuzzy), owner, goods/services (substring or full-text word match), serial or registration number, attorney of record, mark description, pseudo-mark, translation, transliteration, disclaimer, international class, status code, and filing or registration date ranges. Returns compact summaries with a total match count. |
 | `get_trademark` | Retrieve the complete record for one serial number — full goods/services text, owner details, status history, classifications, and prior registrations. |
 | `get_account` | Report the connected account, plan tier, authentication method, and calls used, included, and remaining this billing period. Takes no arguments, reports only on the authenticated caller, and does not count against your quota. |
 
@@ -75,6 +94,29 @@ least one narrowing filter (`markLiteral`, `ownerName`, `serialNumber`, `registr
 `goodsAndServices`, or another text filter) — class, status, and date filters alone match too much
 of the register to run. When a query is rejected or times out, the tool replies with the specific
 parameter to change, so the agent can correct itself and retry.
+
+**All three tools are read-only** and say so: each is annotated `readOnlyHint: true`. That matters
+for agents. A real clearance screen is often a dozen or more searches, and clients that honor tool
+annotations can run read-only calls without stopping to ask permission for each one.
+
+---
+
+## What agents use it for
+
+- **Name clearance screens.** Hand the agent a shortlist and it checks each candidate across the
+  relevant classes before anyone pays for a full search — see
+  [Sample 1](examples/prompts.md#sample-1--naming-shortlist-screened-against-the-register).
+- **Portfolio and maintenance reviews.** Pull every mark an owner holds, with full records, so the
+  agent can flag what's abandoned, pending, or approaching a post-registration filing window.
+- **Competitor watch.** Everything a competitor has filed, narrowed by owner name and filing date.
+- **Finding the near-misses.** Fuzzy matching plus pseudo-mark, translation, and transliteration
+  fields surface the phonetic, stylized, and foreign-language variants an exact search misses.
+- **Drafting goods and services.** Full-text word search across how other filers described similar
+  goods, before you write your own identification.
+- **Attorney and firm research.** Every filing where a given attorney is of record.
+
+The agent reads and reasons over the records; it does not make the legal call. See
+[Scope & safety](#scope--safety).
 
 ---
 
@@ -166,7 +208,9 @@ the "fully quit before editing" gotcha) at [goalieip.com/docs#mcp](https://www.g
 | **Transport** | Streamable HTTP (remote — nothing to install or self-host) |
 | **Protocol revisions** | `2026-07-28` native; `2025-11-25` also answered on the same URL |
 | **Authentication** | OAuth 2.1 (PKCE + Dynamic Client Registration, scope `trademark.read`), or a Bearer API key identical to the REST API — same endpoint |
-| **Coverage** | US federal (USPTO) applications and registrations, refreshed daily |
+| **Tools** | `search_trademarks`, `get_trademark`, `get_account` — all annotated `readOnlyHint: true` |
+| **Coverage** | US federal (USPTO) applications and registrations, from Goalie IP's own copy of the register, refreshed daily |
+| **Free tier** | 200 calls/month, no credit card |
 
 Always configure the `www` host. `goalieip.com` 301-redirects to `www`, and many clients drop the
 `Authorization` header across the redirect (→ a `401`). More troubleshooting:
@@ -199,6 +243,35 @@ quota faster than a scripted one-request-per-lookup integration. Budget for that
   not assess registrability, likelihood of confusion, or infringement, and using them creates no
   attorney-client relationship. For an attorney-led clearance opinion or enforcement work,
   [talk to the Goalie IP team](https://www.goalieip.com/contact).
+
+---
+
+## FAQ
+
+**Is there an MCP server for USPTO trademark data?**
+Yes — this one. It runs over Goalie IP's own daily-refreshed copy of the USPTO trademark register
+(14M+ US federal records), not a live connection to USPTO systems. Goalie IP is not affiliated with
+or endorsed by the USPTO.
+
+**How is this different from a TSDR MCP server?**
+TSDR returns one record when you already know its serial or registration number. This server
+searches the whole register by mark, owner, goods/services, class, status, date, and more — so an
+agent can find marks it has no numbers for, then pull full records.
+
+**Do I need an API key?**
+No. Clients with OAuth support — Claude Desktop, claude.ai, Claude Code — sign you in with your
+Goalie IP account. Keys are there for scripts, CI, and clients without OAuth.
+
+**Is it free?**
+There's a free tier of 200 calls/month with no credit card. MCP access is included with every API
+plan and shares the same quota as the REST API.
+
+**Does it cover state, common-law, or international trademarks?**
+No. US federal (USPTO) applications and registrations only.
+
+**Is it legal advice?**
+No. It returns register records. It doesn't assess registrability, likelihood of confusion, or
+infringement.
 
 ---
 
