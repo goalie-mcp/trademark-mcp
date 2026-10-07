@@ -11,8 +11,8 @@ Point Claude, Cursor, or any MCP client at one URL. No integration code, nothing
 **free to start: 200 calls/month, no credit card.**
 
 - **Search, not lookup.** Find the marks you *don't* already have serial numbers for.
-- **Catches the variants.** Fuzzy matching, plus the USPTO's own pseudo-mark field (`GR8` → `GREAT`),
-  translations, and transliterations — the places near-conflicts hide.
+- **Catches the variants.** Screen a proposed name for exact matches, spelling variants,
+  sound-alikes, and the USPTO's own pseudo-mark readings (`EZ` → `EASY`) in one call.
 - **Runs without babysitting.** Every tool is declared read-only, so clients that honor tool
   annotations can run a dozen searches without a confirmation prompt on each one.
 - **Sign in, no key required.** One-click OAuth on claude.ai and Claude Desktop; a Bearer key when you
@@ -33,16 +33,16 @@ have the numbers for.
 | Capability | TSDR-based MCP | Goalie IP MCP |
 |---|:---:|:---:|
 | Retrieve a record by serial or registration number | ✅ | ✅ |
-| Search by mark text — exact, contains, or fuzzy | ❌ | ✅ |
+| Search by mark text — exact, contains, or typo-tolerant spelling lookup | ❌ | ✅ |
 | Filter by owner, goods/services, and class | ❌ | ✅ |
 | Filter by status and filing / registration date | ❌ | ✅ |
 | Match phonetic and stylized variants via the USPTO pseudo-mark | ❌ | ✅ |
 | Search translations, disclaimers, mark descriptions, and attorney of record | ❌ | ✅ |
-| Surface similar marks for clearance-style questions | ❌ | ✅ |
+| Screen a proposed name for similar marks, including sound-alikes | ❌ | ✅ |
 | Search across all 14M+ US federal records at once | ❌ | ✅ |
 
-See [`examples/prompts.md`](examples/prompts.md) for two real sessions — including a ten-name
-clearance screen that a lookup-only tool cannot begin, because no serial numbers are known going in.
+See [`examples/prompts.md`](examples/prompts.md) for real sessions and a proposed-name screening
+example. A lookup-only tool cannot begin those questions because no serial numbers are known going in.
 
 ---
 
@@ -80,37 +80,41 @@ Then just ask — the agent picks the tool and filters on its own:
 
 ---
 
-## The three tools
+## The five tools
 
 | Tool | What it does |
 |---|---|
-| `search_trademarks` | Search 14M+ US federal records by mark text (exact, contains, or fuzzy), owner, goods/services (substring or full-text word match), serial or registration number, attorney of record, mark description, pseudo-mark, translation, transliteration, disclaimer, international class, status code, and filing or registration date ranges. Returns compact summaries with a total match count. |
-| `get_trademark` | Retrieve the complete record for one serial number — full goods/services text, owner details, status history, classifications, and prior registrations. |
-| `get_account` | Report the connected account, plan tier, authentication method, and calls used, included, and remaining this billing period. Takes no arguments, reports only on the authenticated caller, and does not count against your quota. |
+| `search_trademarks` | Look up and filter 14M+ US federal records by mark text (exact, contains, or a typo-tolerant spelling lookup), owner, goods/services (substring or full-text word match), serial or registration number, attorney of record, mark description, pseudo-mark, translation, transliteration, disclaimer, international class, status code, and filing or registration date ranges. Returns compact summaries with a total match count. The spelling lookup does not find sound-alikes; use `find_similar_marks` for proposed-name questions. |
+| `get_trademark` | Retrieve the complete record for one serial number — full goods/services text, owner details, status and status history, classifications, and filing and registration dates. |
+| `find_similar_marks` | Screen a proposed brand, product, app, or company name in one call. Finds exact matches, spelling variants, sound-alikes (`KWIK` vs. `QUICK`), and the USPTO's own pseudo-mark readings (`EZ` as `EASY`). Results are ranked high, medium, or low by match strength and how closely their classes relate through the USPTO coordinated-class table. Returns every strong match, 100 per page when needed, with dead marks listed separately. Inputs: `mark` (required), `classes`, `includeDead` (`recent`, `all`, or `none`), `minTier`, and `page`. A screening aid, not a clearance search or legal opinion. |
+| `get_deadlines` | Compute US federal trademark deadlines for one `serialNumber`, or upcoming deadlines across marks matching an `ownerName`. Covers office action responses, statement of use and extensions, Sections 8, 9, and 71, grace periods, and revival windows. Owner searches can also set `withinDays` and `includeDead`. These are computed dates to confirm with the USPTO. |
+| `get_account` | Report the connected account, plan, authentication method, calls used, included, and remaining this billing period, and the reset date. Takes no arguments, reports only on the connected account, and is never billed. |
 
 `search_trademarks` returns compact summaries (page size defaults to 10, capped at 15) sized to sit
 in a model's context window; call `get_trademark` for the full record. Every search must include at
 least one narrowing filter (`markLiteral`, `ownerName`, `serialNumber`, `registrationNumber`,
 `goodsAndServices`, or another text filter) — class, status, and date filters alone match too much
 of the register to run. When a query is rejected or times out, the tool replies with the specific
-parameter to change, so the agent can correct itself and retry.
+parameter to change, so the agent can correct itself and retry. Text filters generally have a
+three-character minimum, except exact-mode `markLiteral`, which supports short marks such as `3M`,
+and word-mode `goodsAndServices`, which has a two-character minimum.
 
-**All three tools are read-only** and say so: each is annotated `readOnlyHint: true`. That matters
-for agents. A real clearance screen is often a dozen or more searches, and clients that honor tool
-annotations can run read-only calls without stopping to ask permission for each one.
+**All five tools are read-only** and say so: each is annotated `readOnlyHint: true`. That matters
+for agents. Clients that honor tool annotations can run read-only calls without stopping to ask
+permission for each one. The four trademark-data tools are metered; `get_account` is never billed.
 
 ---
 
 ## What agents use it for
 
-- **Name clearance screens.** Hand the agent a shortlist and it checks each candidate across the
-  relevant classes before anyone pays for a full search — see
+- **Proposed-name screens.** Hand the agent a shortlist and `find_similar_marks` checks each
+  candidate for similar US federal marks in the relevant classes — see
   [Sample 1](examples/prompts.md#sample-1--naming-shortlist-screened-against-the-register).
-- **Portfolio and maintenance reviews.** Pull every mark an owner holds, with full records, so the
-  agent can flag what's abandoned, pending, or approaching a post-registration filing window.
+- **Portfolio and maintenance reviews.** Find an owner's marks and use `get_deadlines` to identify
+  upcoming US federal filing dates, including applicable windows and grace periods.
 - **Competitor watch.** Everything a competitor has filed, narrowed by owner name and filing date.
-- **Finding the near-misses.** Fuzzy matching plus pseudo-mark, translation, and transliteration
-  fields surface the phonetic, stylized, and foreign-language variants an exact search misses.
+- **Finding the near-misses.** `find_similar_marks` catches spelling variants, sound-alikes, and
+  pseudo-mark readings; `search_trademarks` can separately filter translations and transliterations.
 - **Drafting goods and services.** Full-text word search across how other filers described similar
   goods, before you write your own identification.
 - **Attorney and firm research.** Every filing where a given attorney is of record.
@@ -208,7 +212,7 @@ the "fully quit before editing" gotcha) at [goalieip.com/docs#mcp](https://www.g
 | **Transport** | Streamable HTTP (remote — nothing to install or self-host) |
 | **Protocol revisions** | `2026-07-28` native; `2025-11-25` also answered on the same URL |
 | **Authentication** | OAuth 2.1 (PKCE + Dynamic Client Registration, scope `trademark.read`), or a Bearer API key identical to the REST API — same endpoint |
-| **Tools** | `search_trademarks`, `get_trademark`, `get_account` — all annotated `readOnlyHint: true` |
+| **Tools** | `search_trademarks`, `get_trademark`, `find_similar_marks`, `get_deadlines`, `get_account` — all annotated `readOnlyHint: true` |
 | **Coverage** | US federal (USPTO) applications and registrations, from Goalie IP's own copy of the register, refreshed daily |
 | **Free tier** | 200 calls/month, no credit card |
 

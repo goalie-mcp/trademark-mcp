@@ -2,8 +2,8 @@
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
   "name": "com.goalieip/trademark",
   "title": "Goalie IP Trademark Search (USPTO)",
-  "description": "Search 14M+ US trademarks by mark, owner, goods/services, class, status, and phonetic variants.",
-  "version": "1.0.1",
+  "description": "Search and screen 14M+ US federal trademarks; retrieve records and computed deadlines.",
+  "version": "1.1.0",
   "websiteUrl": "https://www.goalieip.com/mcp",
   "repository": {
     "url": "https://github.com/goalie-mcp/trademark-mcp",

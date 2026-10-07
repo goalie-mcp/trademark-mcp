@@ -4,7 +4,7 @@ Drop-in configuration for connecting each client to the hosted Goalie IP tradema
 `https://www.goalieip.com/api/mcp`.
 
 Looking for what you can *ask* once connected? See [`prompts.md`](prompts.md) for two real sessions
-with full results.
+with full results and a short proposed-name screening example.
 
 ## Two ways to authenticate
 

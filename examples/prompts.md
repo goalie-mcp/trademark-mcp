@@ -2,7 +2,8 @@
 
 Two unedited-in-substance sessions against the live server, run from **Claude Desktop** in July 2026.
 They show the thing that separates a search tool from a lookup tool: in neither case did the user know
-a serial or registration number going in.
+a serial or registration number going in. A third, shorter example shows the proposed-name tool added
+in October 2026 without fabricating a result.
 
 Transcripts are abridged only to remove repeated client UI noise (the "Used goalieip integration"
 lines that Claude Desktop prints on each tool call); elisions are marked `[…]`. Editorial corrections
@@ -142,7 +143,24 @@ then determine the next maintenance deadline for each.
 **What the agent did:** one `search_trademarks` call filtered by `ownerName`, then a `get_trademark`
 call per serial number. The deadline calculations come from the model applying statutory rules to the
 registration dates and prosecution history in those full records — the tools supply the facts, not
-the arithmetic.
+the arithmetic. This July 2026 session predates `get_deadlines`; today, the agent should use that
+purpose-built tool and treat its computed dates as dates to confirm with the USPTO.
+
+---
+
+## Sample 3 — Proposed name screened in one call
+
+### Prompt
+
+```
+Is LILAH taken for coffee?
+```
+
+**What the agent does:** calls `find_similar_marks` with `mark: "LILAH"` and `classes: ["30"]`.
+The tool returns ranked live matches, grouped by high, medium, or low match strength and class
+relationship, with dead marks listed separately. It can catch exact matches, spelling variants,
+sound-alikes, and USPTO pseudo-mark readings. The result is a screening aid covering the US federal
+register only, not a clearance search or legal opinion.
 
 ---
 
@@ -150,8 +168,9 @@ the arithmetic.
 
 - **Search, not lookup.** Both sessions began with no serial or registration number. Sample 1 could
   not be started at all with a TSDR-wrapper tool.
-- **Two tools, two jobs.** `search_trademarks` narrows; `get_trademark` supplies the full record when
-  the answer depends on status history or goods/services text.
+- **Use the purpose-built tool.** `find_similar_marks` screens a proposed name; `search_trademarks`
+  filters the register; `get_trademark` supplies a full record; and `get_deadlines` computes US
+  federal filing dates to confirm with the USPTO.
 - **Budget for multiple calls.** Sample 1 used about ten tool calls for one question. MCP usage draws
   on the same quota as the REST API, so agentic sessions consume it faster than scripted lookups —
   see [Pricing](../README.md#pricing).
