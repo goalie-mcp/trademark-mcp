@@ -1,205 +1,105 @@
-# Trademark MCP Server (USPTO)
+# Goalie IP Trademark MCP (USPTO)
 
 [![MCP Badge](https://lobehub.com/badge/mcp-full/goalieip-trademark-mcp?theme=light)](https://lobehub.com/mcp/goalieip-trademark-mcp)
 
-A remote **[Model Context Protocol](https://modelcontextprotocol.io)** server that lets an AI agent
-**search and filter 14M+ US federal trademark records** — by mark text, owner, goods/services, class,
-status, date, and every other searchable field on the record — then pull any full record by serial
-number.
+Give Claude, Cursor, or any MCP client one endpoint for searching the U.S. federal trademark
+register, screening a proposed name, retrieving full records, and checking upcoming deadlines.
 
-Point Claude, Cursor, or any MCP client at one URL. No integration code, nothing to install, and
-**free to start: 200 calls/month, no credit card.**
+Goalie IP searches its own daily-refreshed copy of 14M+ USPTO applications and registrations. The
+hosted server is ready to use: no package to install, integration code to write, or database to run.
 
-- **Search, not lookup.** Find the marks you *don't* already have serial numbers for.
-- **Catches the variants.** Screen a proposed name for exact matches, spelling variants,
-  sound-alikes, and the USPTO's own pseudo-mark readings (`EZ` → `EASY`) in one call.
-- **Runs without babysitting.** Every tool is declared read-only, so clients that honor tool
-  annotations can run a dozen searches without a confirmation prompt on each one.
-- **Sign in, no key required.** One-click OAuth on claude.ai and Claude Desktop; a Bearer key when you
-  want one for scripts and CLI.
+- **Screen a proposed name in one call.** Find exact matches, spelling variants, sound-alikes
+  (`KWIK` vs. `QUICK`), and the USPTO's own pseudo-mark readings (`EZ` as `EASY`).
+- **Search the register, not just known serial numbers.** Filter by mark, owner, goods/services,
+  class, status, dates, attorney, and more.
+- **Get deadline answers from a purpose-built tool.** Check one serial number or upcoming dates
+  across an owner's marks.
+- **Let agents work without babysitting.** All five tools are declared read-only.
 
-> **Start free and read the docs:** **[goalieip.com/mcp](https://www.goalieip.com/mcp)** ·
-> setup for every client at **[goalieip.com/docs#mcp](https://www.goalieip.com/docs#mcp)**
+> **Connect:** `https://www.goalieip.com/api/mcp`<br>
+> **[Start free](https://www.goalieip.com/signup)** · **[Setup guide](https://www.goalieip.com/docs#mcp)** · **[Example prompts](examples/prompts.md)**
 
 ---
 
-## Not another TSDR wrapper
+## More than a TSDR lookup
 
-Most "trademark MCP" servers wrap the USPTO's **TSDR** endpoint, which returns a single record only
-when you *already know* its serial or registration number. That's a lookup tool. This server
-**searches and filters the whole register**, so your agent can find the marks it doesn't already
-have the numbers for.
+TSDR returns a record when you already know its serial or registration number. Goalie IP lets an
+agent begin with the question the user actually has: *Is this name taken? What has this owner filed?
+Which marks cover these goods? What is due next?*
 
 | Capability | TSDR-based MCP | Goalie IP MCP |
 |---|:---:|:---:|
-| Retrieve a record by serial or registration number | ✅ | ✅ |
-| Search by mark text — exact, contains, or typo-tolerant spelling lookup | ❌ | ✅ |
-| Filter by owner, goods/services, and class | ❌ | ✅ |
-| Filter by status and filing / registration date | ❌ | ✅ |
-| Match phonetic and stylized variants via the USPTO pseudo-mark | ❌ | ✅ |
-| Search translations, disclaimers, mark descriptions, and attorney of record | ❌ | ✅ |
-| Screen a proposed name for similar marks, including sound-alikes | ❌ | ✅ |
-| Search across all 14M+ US federal records at once | ❌ | ✅ |
-
-See [`examples/prompts.md`](examples/prompts.md) for real sessions and a proposed-name screening
-example. A lookup-only tool cannot begin those questions because no serial numbers are known going in.
+| Retrieve a known record | ✅ | ✅ |
+| Search and filter the full U.S. federal register | ❌ | ✅ |
+| Screen a proposed name for similar marks and sound-alikes | ❌ | ✅ |
+| Search by owner, goods/services, class, status, and dates | ❌ | ✅ |
+| Compute upcoming U.S. federal trademark deadlines | ❌ | ✅ |
 
 ---
 
-## Quickstart (Claude Code)
+## Connect in a minute
 
-No key needed — one command, then sign in:
+### Claude Code
 
 ```bash
 claude mcp add --transport http goalieip https://www.goalieip.com/api/mcp
 ```
 
-Claude Code opens a browser to sign in with your Goalie IP account over OAuth. No account yet?
-[Sign up free](https://www.goalieip.com/signup) — 200 calls/month, no credit card; just confirm your
-email to activate.
+Claude opens a browser for OAuth sign-in. No API key is required.
 
-Prefer a key, for scripts or CI? Create one in your
-[Goalie IP portal](https://www.goalieip.com/portal/api-keys) and pass it as a header:
+### Claude Desktop and claude.ai
 
-```bash
-claude mcp add --transport http goalieip \
-  https://www.goalieip.com/api/mcp \
-  --header "Authorization: Bearer gip_live_your_key_here"
-```
-
-Then just ask — the agent picks the tool and filters on its own:
-
-```
-> Are there any live trademarks similar to "GOALIE" for software in class 9?
-
-  Searching US federal trademarks…
-  Found 94 matches. 12 are live in class 9, including:
-    GOALIEO   — Goalieo Inc      — Live/Pending  — filed 2026-05-29
-    …
-```
-
----
-
-## The five tools
-
-| Tool | What it does |
-|---|---|
-| `search_trademarks` | Look up and filter 14M+ US federal records by mark text (exact, contains, or a typo-tolerant spelling lookup), owner, goods/services (substring or full-text word match), serial or registration number, attorney of record, mark description, pseudo-mark, translation, transliteration, disclaimer, international class, status code, and filing or registration date ranges. Returns compact summaries with a total match count. The spelling lookup does not find sound-alikes; use `find_similar_marks` for proposed-name questions. |
-| `get_trademark` | Retrieve the complete record for one serial number — full goods/services text, owner details, status and status history, classifications, and filing and registration dates. |
-| `find_similar_marks` | Screen a proposed brand, product, app, or company name in one call. Finds exact matches, spelling variants, sound-alikes (`KWIK` vs. `QUICK`), and the USPTO's own pseudo-mark readings (`EZ` as `EASY`). Results are ranked high, medium, or low by match strength and how closely their classes relate through the USPTO coordinated-class table. Returns every strong match, 100 per page when needed, with dead marks listed separately. Inputs: `mark` (required), `classes`, `includeDead` (`recent`, `all`, or `none`), `minTier`, and `page`. A screening aid, not a clearance search or legal opinion. |
-| `get_deadlines` | Compute US federal trademark deadlines for one `serialNumber`, or upcoming deadlines across marks matching an `ownerName`. Covers office action responses, statement of use and extensions, Sections 8, 9, and 71, grace periods, and revival windows. Owner searches can also set `withinDays` and `includeDead`. These are computed dates to confirm with the USPTO. |
-| `get_account` | Report the connected account, plan, authentication method, calls used, included, and remaining this billing period, and the reset date. Takes no arguments, reports only on the connected account, and is never billed. |
-
-`search_trademarks` returns compact summaries (page size defaults to 10, capped at 15) sized to sit
-in a model's context window; call `get_trademark` for the full record. Every search must include at
-least one narrowing filter (`markLiteral`, `ownerName`, `serialNumber`, `registrationNumber`,
-`goodsAndServices`, or another text filter) — class, status, and date filters alone match too much
-of the register to run. When a query is rejected or times out, the tool replies with the specific
-parameter to change, so the agent can correct itself and retry. Text filters generally have a
-three-character minimum, except exact-mode `markLiteral`, which supports short marks such as `3M`,
-and word-mode `goodsAndServices`, which has a two-character minimum.
-
-**All five tools are read-only** and say so: each is annotated `readOnlyHint: true`. That matters
-for agents. Clients that honor tool annotations can run read-only calls without stopping to ask
-permission for each one. The four trademark-data tools are metered; `get_account` is never billed.
-
----
-
-## What agents use it for
-
-- **Proposed-name screens.** Hand the agent a shortlist and `find_similar_marks` checks each
-  candidate for similar US federal marks in the relevant classes — see
-  [Sample 1](examples/prompts.md#sample-1--naming-shortlist-screened-against-the-register).
-- **Portfolio and maintenance reviews.** Find an owner's marks and use `get_deadlines` to identify
-  upcoming US federal filing dates, including applicable windows and grace periods.
-- **Competitor watch.** Everything a competitor has filed, narrowed by owner name and filing date.
-- **Finding the near-misses.** `find_similar_marks` catches spelling variants, sound-alikes, and
-  pseudo-mark readings; `search_trademarks` can separately filter translations and transliterations.
-- **Drafting goods and services.** Full-text word search across how other filers described similar
-  goods, before you write your own identification.
-- **Attorney and firm research.** Every filing where a given attorney is of record.
-
-The agent reads and reasons over the records; it does not make the legal call. See
-[Scope & safety](#scope--safety).
-
----
-
-## In the MCP Registry
-
-This server is published to the official
-[MCP Registry](https://registry.modelcontextprotocol.io) as **`com.goalieip/trademark`**, under a
-namespace verified against the `goalieip.com` domain — so the listing is first-party, not a
-third-party mirror.
-
-```bash
-curl "https://registry.modelcontextprotocol.io/v0/servers?search=com.goalieip/trademark"
-```
-
-Clients that read the registry can add the server by name and will prompt for authorization
-themselves — an OAuth sign-in, or an API key. Clients that don't, use the manual configs below.
-
----
-
-## Connect from any client
-
-Two ways to authenticate, both on the same endpoint:
-
-- **OAuth** — easiest for apps with a *Connect* / *Add connector* screen (Claude Desktop, claude.ai).
-  Paste the endpoint URL and sign in with your Goalie IP account when prompted; the client registers
-  itself automatically (Dynamic Client Registration + PKCE) and needs no key.
-- **API key** — for CLI and programmatic clients. Send your key as an `Authorization: Bearer` header.
-  Create one in your [portal](https://www.goalieip.com/portal/api-keys).
-
-Drop-in config files for the API-key path are in [`examples/`](examples/); replace
-`gip_live_your_key_here` with a real key.
-
-### Claude API (MCP connector)
-
-```json
-{
-  "mcp_servers": [
-    {
-      "type": "url",
-      "url": "https://www.goalieip.com/api/mcp",
-      "name": "goalieip",
-      "authorization_token": "gip_live_your_key_here"
-    }
-  ]
-}
-```
-
-### Any MCP client / Cursor (generic config)
-
-```json
-{
-  "mcpServers": {
-    "goalieip": {
-      "type": "http",
-      "url": "https://www.goalieip.com/api/mcp",
-      "headers": {
-        "Authorization": "Bearer gip_live_your_key_here"
-      }
-    }
-  }
-}
-```
-
-### Claude Desktop & claude.ai
-
-Use OAuth — no bridge, no key file. Open **Settings → Connectors → Add custom connector** and paste
-the endpoint URL:
+Open **Settings → Connectors → Add custom connector**, then paste:
 
 ```
 https://www.goalieip.com/api/mcp
 ```
 
-Claude registers itself automatically (PKCE), sends you to sign in with your Goalie IP account, and
-stores the token. Approve the `trademark.read` scope and you're connected.
+For Cursor, scripts, CI, and clients without OAuth, create an API key in the
+[Goalie IP portal](https://www.goalieip.com/portal/api-keys). Drop-in configurations are in
+[`examples/`](examples/), with complete setup and troubleshooting at
+[goalieip.com/docs#mcp](https://www.goalieip.com/docs#mcp).
 
-*No-OAuth fallback (older clients):* attach an API key through the
-[`mcp-remote`](https://github.com/geelen/mcp-remote) bridge — config in
-[`examples/claude-desktop-config.json`](examples/claude-desktop-config.json), full steps (including
-the "fully quit before editing" gotcha) at [goalieip.com/docs#mcp](https://www.goalieip.com/docs#mcp).
+Always use the `www` host. Some clients drop authorization headers when following the redirect from
+`goalieip.com` to `www.goalieip.com`.
+
+---
+
+## Five read-only tools
+
+| Tool | What it does |
+|---|---|
+| `find_similar_marks` | Screen a proposed name for exact matches, spelling variants, sound-alikes, and USPTO pseudo-mark readings, ranked by match strength and related classes. |
+| `search_trademarks` | Search and filter the U.S. federal register by mark, owner, goods/services, class, status, dates, attorney, and more. Its `fuzzy` mode is a typo-tolerant spelling lookup, not a sound-alike search. |
+| `get_trademark` | Retrieve the full record for one USPTO serial number. |
+| `get_deadlines` | Compute U.S. federal trademark deadlines for one serial number or upcoming deadlines across an owner's marks. Dates should be confirmed with the USPTO. |
+| `get_account` | Check the connected account, plan, authentication method, usage, and reset date. This tool is never billed. |
+
+All five tools are annotated `readOnlyHint: true`. The four trademark-data tools are metered;
+`get_account` is not. For complete descriptions and input schemas, see the
+[live server card](https://www.goalieip.com/.well-known/mcp/server-card.json).
+
+`find_similar_marks` is a screening aid, not a clearance search or legal opinion. It returns strong
+matches—more when the field is crowded—with dead marks listed separately. For register research by
+owner, goods, dates, or other fields, use `search_trademarks`.
+
+---
+
+## Try asking
+
+```text
+Is LILAH taken for coffee in class 30?
+
+Find every U.S. federal trademark owned by Acme Example Corp.
+
+Show live class 9 marks whose goods mention password management.
+
+What is the next deadline for serial number [USPTO serial number]?
+
+Which deadlines are coming up across Example Company's marks this year?
+```
+
+See [`examples/prompts.md`](examples/prompts.md) for longer examples and the shape of the results.
 
 ---
 
@@ -207,100 +107,65 @@ the "fully quit before editing" gotcha) at [goalieip.com/docs#mcp](https://www.g
 
 | | |
 |---|---|
-| **Registry name** | `com.goalieip/trademark` ([MCP Registry](https://registry.modelcontextprotocol.io)) |
 | **Endpoint** | `https://www.goalieip.com/api/mcp` |
-| **Transport** | Streamable HTTP (remote — nothing to install or self-host) |
-| **Protocol revisions** | `2026-07-28` native; `2025-11-25` also answered on the same URL |
-| **Authentication** | OAuth 2.1 (PKCE + Dynamic Client Registration, scope `trademark.read`), or a Bearer API key identical to the REST API — same endpoint |
-| **Tools** | `search_trademarks`, `get_trademark`, `find_similar_marks`, `get_deadlines`, `get_account` — all annotated `readOnlyHint: true` |
-| **Coverage** | US federal (USPTO) applications and registrations, from Goalie IP's own copy of the register, refreshed daily |
-| **Free tier** | 200 calls/month, no credit card |
+| **Official MCP Registry name** | `com.goalieip/trademark` |
+| **Transport** | Streamable HTTP |
+| **Authentication** | OAuth 2.1 or Bearer API key |
+| **Coverage** | U.S. federal trademark applications and registrations |
+| **Data source** | Goalie IP's daily-refreshed copy of the USPTO register |
 
-Always configure the `www` host. `goalieip.com` 301-redirects to `www`, and many clients drop the
-`Authorization` header across the redirect (→ a `401`). More troubleshooting:
-[goalieip.com/docs#mcp](https://www.goalieip.com/docs#mcp).
+The server is published under a `goalieip.com`-verified namespace in the
+[official MCP Registry](https://registry.modelcontextprotocol.io/v0/servers?search=com.goalieip/trademark).
 
 ---
 
 ## Pricing
 
-MCP access is **included with every Goalie IP API plan** at no extra cost — it uses the same key and
-the same monthly quota as the REST API. The **free tier is 200 calls/month** (no credit card).
-Compare plans at [goalieip.com/subscribe#api](https://www.goalieip.com/subscribe#api).
-
-One note on sizing: agents typically make several tool calls to answer one question, so MCP consumes
-quota faster than a scripted one-request-per-lookup integration. Budget for that when picking a plan.
+MCP access is included with every Goalie IP API plan and uses the same monthly allowance. The free
+tier includes 200 calls per month with no credit card. [Compare plans](https://www.goalieip.com/subscribe#api).
 
 ---
 
-## Scope & safety
+## Coverage and trust
 
-- **US federal data only.** This is a continuously-refreshed copy of the USPTO trademark register,
-  updated daily and occasionally a day behind. It does **not** cover US state registrations,
-  unregistered common-law use, or trademark offices outside the United States. Goalie IP is **not
-  affiliated with or endorsed by the USPTO**.
-- **Record text is third-party input.** Mark text, owner names, and goods/services descriptions are
-  written by whoever filed the application, and every US filing becomes a public record. Tool
-  responses fence that content and label it as data — but if you build your own agent on this data,
-  apply your own checks before letting record text drive tool calls or privileged actions.
-- **Results are data, not legal advice.** These tools return records from the USPTO register. They do
-  not assess registrability, likelihood of confusion, or infringement, and using them creates no
-  attorney-client relationship. For an attorney-led clearance opinion or enforcement work,
-  [talk to the Goalie IP team](https://www.goalieip.com/contact).
+- **U.S. federal records only.** The tools cover USPTO applications and registrations. They do not
+  search state registrations, unregistered common-law use, foreign trademark offices, the web,
+  marketplaces, social media, or domain names.
+- **Goalie IP's copy of the register.** Data is refreshed daily and can occasionally be a day behind.
+  This is not a live connection to USPTO systems. Goalie IP is not affiliated with or endorsed by
+  the USPTO.
+- **Data, not legal advice.** Results do not decide registrability, likelihood of confusion, or
+  infringement, and using the tools does not create an attorney-client relationship.
+- **Public-record text is untrusted input.** Mark text, owner names, and goods/services descriptions
+  come from public filings. Tool responses fence and label record content, but builders should apply
+  their own checks before allowing it to drive privileged actions.
+
+For an attorney-led opinion or enforcement work, [contact the Goalie IP team](https://www.goalieip.com/contact).
 
 ---
 
-## FAQ
+## Privacy
 
-**Is there an MCP server for USPTO trademark data?**
-Yes — this one. It runs over Goalie IP's own daily-refreshed copy of the USPTO trademark register
-(14M+ US federal records), not a live connection to USPTO systems. Goalie IP is not affiliated with
-or endorsed by the USPTO.
+The server records one usage row per metered call—the credential identifier, tool, status code, and
+timestamp—for allowance enforcement, billing, and abuse detection. **Query contents are not stored,**
+and conversation prompts and files do not reach the server. OAuth tokens are stored only as hashes
+and can be revoked from the account portal.
 
-**How is this different from a TSDR MCP server?**
-TSDR returns one record when you already know its serial or registration number. This server
-searches the whole register by mark, owner, goods/services, class, status, date, and more — so an
-agent can find marks it has no numbers for, then pull full records.
-
-**Do I need an API key?**
-No. Clients with OAuth support — Claude Desktop, claude.ai, Claude Code — sign you in with your
-Goalie IP account. Keys are there for scripts, CI, and clients without OAuth.
-
-**Is it free?**
-There's a free tier of 200 calls/month with no credit card. MCP access is included with every API
-plan and shares the same quota as the REST API.
-
-**Does it cover state, common-law, or international trademarks?**
-No. US federal (USPTO) applications and registrations only.
-
-**Is it legal advice?**
-No. It returns register records. It doesn't assess registrability, likelihood of confusion, or
-infringement.
+Read the full [Privacy Policy](https://www.goalieip.com/legal/privacy).
 
 ---
 
 ## Links
 
-- **Example prompts & real results:** [`examples/prompts.md`](examples/prompts.md)
-- **Overview:** https://www.goalieip.com/mcp
-- **MCP Registry listing:** https://registry.modelcontextprotocol.io/v0/servers?search=com.goalieip/trademark
-- **Full docs:** https://www.goalieip.com/docs#mcp
-- **Get an API key:** https://www.goalieip.com/portal/api-keys
-- **Plans & pricing:** https://www.goalieip.com/subscribe#api
-- **Support:** reid@goalieip.com
-
-## Privacy Policy
-
-https://www.goalieip.com/legal/privacy
-
-The server records one usage log row per billable call — the credential identifier, the tool called,
-the status code, and the timestamp — for quota enforcement, billing, and abuse detection. **The
-contents of your queries are not stored**, and nothing about your conversation, prompts, or files
-reaches the server. OAuth tokens are stored only as hashes, and any authorized client can be revoked
-from your account portal at any time. The policy above covers collection, use, third-party sharing,
-retention, and how to contact us.
+- [Product overview](https://www.goalieip.com/mcp)
+- [Setup and troubleshooting](https://www.goalieip.com/docs#mcp)
+- [Example prompts](examples/prompts.md)
+- [Live tool descriptions and schemas](https://www.goalieip.com/.well-known/mcp/server-card.json)
+- [Official MCP Registry listing](https://registry.modelcontextprotocol.io/v0/servers?search=com.goalieip/trademark)
+- [API key portal](https://www.goalieip.com/portal/api-keys)
+- [Support](mailto:reid@goalieip.com)
 
 ## License
 
 [MIT](LICENSE) © Goalie IP Inc. This repository documents how to connect to the hosted Goalie IP
-trademark MCP server; the server and the underlying data are operated by Goalie IP.
+trademark MCP server; the server and underlying data are operated by Goalie IP.
