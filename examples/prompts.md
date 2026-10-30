@@ -14,7 +14,7 @@ are in `[square brackets]`. No results were changed.
 > show the shape of an answer, not as current data.
 >
 > **Not legal advice.** These are register search results. They do not assess registrability or
-> likelihood of confusion. See [Scope & safety](../README.md#scope--safety).
+> likelihood of confusion. See [Coverage and trust](../README.md#coverage-and-trust).
 
 ---
 
@@ -169,8 +169,9 @@ register only, not a clearance search or legal opinion.
 - **Search, not lookup.** Both sessions began with no serial or registration number. Sample 1 could
   not be started at all with a TSDR-wrapper tool.
 - **Use the purpose-built tool.** `find_similar_marks` screens a proposed name; `search_trademarks`
-  filters the register; `get_trademark` supplies a full record; and `get_deadlines` computes US
-  federal filing dates to confirm with the USPTO.
+  filters the register; `get_trademark` supplies a full record; `get_deadlines` computes US
+  federal filing dates to confirm with the USPTO; and `search_id_manual` finds acceptable goods and
+  services wording. Pass `register: "CA"` to the first three to search Canada instead.
 - **Budget for multiple calls.** Sample 1 used about ten tool calls for one question. MCP usage draws
   on the same quota as the REST API, so agentic sessions consume it faster than scripted lookups —
   see [Pricing](../README.md#pricing).
